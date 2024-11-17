@@ -182,7 +182,7 @@ export default {
         return
       }
       this.loading = true
-      fetch(`https://feiyangdigital.v1.mk/api/jiemi.php?url=${encodeURIComponent(this.url)}`)
+      fetch(`http://www.xn--sss604efuw.com/jm/jiemi.php?url=${encodeURIComponent(this.url)}`)
           .then(response => response.text())
           .then(data => {
             this.originResult = data
