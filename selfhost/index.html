@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TVBox 接口解密（自研版）</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,"Microsoft YaHei",sans-serif;background:#0f1220;color:#e8eaf0;padding:24px 16px}
+  .wrap{max-width:820px;margin:0 auto}
+  h1{font-size:20px;margin:0 0 18px;text-align:center}
+  .row{display:flex;gap:8px;margin-bottom:12px}
+  select,button,input,textarea{font-size:14px;border-radius:8px;border:1px solid #2a2f45;background:#171b2e;color:#e8eaf0;padding:10px 12px}
+  select{flex:1}
+  button{cursor:pointer;background:#2b6bff;border-color:#2b6bff;white-space:nowrap}
+  button.ghost{background:transparent;color:#9aa3b8}
+  input{width:100%}
+  textarea{width:100%;height:340px;resize:vertical;font-family:ui-monospace,Consolas,monospace;font-size:12px}
+  .hint{color:#7a8296;font-size:12px;margin:6px 0 16px}
+  .err{color:#ff6b6b;font-size:13px;min-height:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>TVBox / 影视接口解密（自研 · 后端 box.php）</h1>
+  <div class="row">
+    <select id="preset">
+      <option value="">— 选择预设线路，或下方粘贴自定义地址 —</option>
+    </select>
+  </div>
+  <input id="url" type="text" placeholder="粘贴加密配置地址，如 http://www.饭太硬.cc/tv">
+  <div class="row" style="margin-top:12px">
+    <button id="go" onclick="decrypt()">解密</button>
+    <button class="ghost" onclick="copyText()">复制结果</button>
+    <button class="ghost" onclick="downloadJar()">下载 spider jar</button>
+  </div>
+  <div class="err" id="err"></div>
+  <div class="hint">解密在后端 box.php 完成（自动识别图片隐写/base64/明文）。结果含"去广告纯净 JSON"。</div>
+  <textarea id="result" placeholder="解密结果…" readonly></textarea>
+</div>
+<script>
+const PRESET = [
+  ["饭太硬线路","http://www.饭太硬.cc/tv"],
+  ["肥猫线路","http://肥猫.com"],
+  ["放牛线路","http://tvbox.王二小放牛娃.xyz"],
+  ["OK线路","http://ok321.top/tv"],
+  ["骚0线路","https://www.100km.top/0"],
+  ["菜妮丝线路","https://tv.xn--yhqu5zs87a.top"],
+  ["PG线路","http://152.32.170.60/leevi/PiG/raw/branch/master/jsm.json"],
+  ["道长线路","https://pastebin.com/raw/5NHaxyGR"],
+  ["小白线路","http://bp.tvbox.cam/"],
+  ["巧儿线路","http://pandown.pro/tvbox/tvbox.json"],
+  ["小米线路","http://xhww.fun/小米/DEMO.json"],
+  ["Ray线路","https://100km.top/0"],
+  ["俊佬线路","http://home.jundie.top:81/top98.json"],
+  ["老刘备线路","https://raw.liucn.cc/box/m.json"],
+  ["荷城线路","http://rihou.cc:88/荷城茶秀"],
+  ["南风线路","https://raw.githubusercontent.com/yoursmile66/TVBox/main/XC.json"],
+  ["开心线路","http://rihou.vip:55/天天开心"],
+  ["东辰线路","https://gitee.com/dongchenys/liu/raw/master/hc.json"],
+  ["星辰线路","http://8.210.232.168/xc.json"],
+  ["神仙线路","http://www.liuyunw.com:88/img"],
+  ["巴拉线路","https://jxjson.icu/balabala"],
+  ["喵影视线路","http://meowtv.cn/tv"],
+  ["万达线路","https://www.macms.pro/box/3.json"],
+  ["小胡线路","http://xiaohu.xzam.cn/xiaohu"],
+  ["小马线路","https://szyyds.cn/tv/x.json"],
+  ["看电影线路","https://tv.lan2wan.top/candymuj.json"],
+  ["摸鱼线路","http://我不是.摸鱼儿.top"],
+  ["业余线路","http://47.108.190.141/yydf/yydf/bd/yydf.json"],
+  ["夜猫子线路","https://codeberg.org/Xym/ymz/raw/branch/main/夜猫子"],
+  ["大头线路","https://tvbox.qhycat.com/tv"],
+  ["影迷线路","http://39.108.153.41/box/影迷.json"],
+  ["云网线路","http://tv.662820.com/api/v3/file/get/135826"],
+  ["无意线路","http://www.wya6.cn/tv/yc.json"]
+];
+const sel = document.getElementById('preset');
+PRESET.forEach(([label, value]) => {
+  const o = document.createElement('option');
+  o.value = value; o.textContent = label;
+  sel.appendChild(o);
+});
+sel.addEventListener('change', () => { if (sel.value) document.getElementById('url').value = sel.value; });
+
+let lastPlain = '';
+function decrypt() {
+  const url = document.getElementById('url').value.trim();
+  const err = document.getElementById('err');
+  err.textContent = '';
+  if (!url) { err.textContent = '请先输入地址'; return; }
+  fetch('box.php?url=' + encodeURIComponent(url))
+    .then(r => r.json())
+    .then(j => {
+      if (!j.ok) { err.textContent = j.error || '解密失败'; return; }
+      lastPlain = j.data;
+      document.getElementById('result').value = j.data;
+      err.textContent = '解密成功，type=' + j.type + '，' + j.size + ' 字符';
+    })
+    .catch(e => { err.textContent = '请求失败：' + e.message; });
+}
+function copyText() {
+  const t = document.getElementById('result');
+  t.select(); document.execCommand('copy');
+}
+function downloadJar() {
+  const t = document.getElementById('result').value;
+  const m = t.match(/"spider"\s*:\s*"([^"]+)"/);
+  if (!m) { document.getElementById('err').textContent = '配置里没有 spider 字段'; return; }
+  let u = m[1].split(';md5;')[0];
+  fetch(u, { headers: { 'User-Agent': 'okhttp' } })
+    .then(r => r.blob())
+    .then(b => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(b); a.download = 'spider.jar'; a.click();
+    });
+}
+</script>
+</body>
+</html>

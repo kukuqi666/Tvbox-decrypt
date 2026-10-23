@@ -3,7 +3,10 @@ name: Deploy Vite App to GitHub Pages
 on:
   push:
     branches:
-      - main  # 或您的主分支名称
+      - main
+  schedule:
+    - cron: '20 3 * * *'
+  workflow_dispatch:
 
 jobs:
   build-deploy:
@@ -16,16 +19,19 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'  # 指定您需要的 Node.js 版本
+          node-version: '16'
 
       - name: Install dependencies
         run: yarn install
 
       - name: Build project
-        run: yarn build  # 或您的构建脚本名称
+        run: yarn build
+
+      - name: Decrypt TVBox configs to mirror
+        run: python3 mirror/decrypt.py mirror/lines.txt dist/mirror "https://kukuqi666.github.io/Tvbox-decrypt/mirror"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GIT_TOKEN }}
-          publish_dir: ./dist  # 或您的构建输出目录
+          publish_dir: ./dist
