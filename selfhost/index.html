@@ -107,7 +107,9 @@ function downloadJar() {
   const m = t.match(/"spider"\s*:\s*"([^"]+)"/);
   if (!m) { document.getElementById('err').textContent = '配置里没有 spider 字段'; return; }
   let u = m[1].split(';md5;')[0];
-  fetch(u, { headers: { 'User-Agent': 'okhttp' } })
+  // 关键：no-referrer 让浏览器跨域请求时不发 Referer
+  //（spider CDN 有 Referer ACL 防盗链，发自身域名会被 403，下成"denied by Referer ACL"假 jar）
+  fetch(u, { referrerPolicy: 'no-referrer' })
     .then(r => r.blob())
     .then(b => {
       const a = document.createElement('a');
