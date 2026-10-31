@@ -1,18 +1,45 @@
 {
-  'use strict';
+  --brand-text: "Protected content - visit www.aipages.dev";
+  --brand-bg: #0f1117;
+}
 
-  var TARGET = 'https://others.aipages.dev/';
 
-  function hostOf(u) {
-    try { return new URL(u).hostname || ''; } catch (e) { return ''; }
-  }
+body::before {
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  background-color: var(--brand-bg) !important;
+  background-image: url("https://ai.aipages.dev/404.svg") !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: min(60vw, 520px) auto !important;
+  z-index: 2147483646 !important;
+  pointer-events: none !important;
+}
 
-  var ref = hostOf(document.referrer) || location.hostname || '';
 
-  if (/^others\.aipages\.dev$/i.test(location.hostname)) return;
+body::after {
+  content: var(--brand-text) !important;
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 8vh !important;
+  text-align: center !important;
+  color: #e8edf7 !important;
+  font: 600 16px/1.5 -apple-system, "Segoe UI", Helvetica, Arial, sans-serif !important;
+  letter-spacing: 0.3px !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9) !important;
+  z-index: 2147483647 !important;
+  pointer-events: none !important;
+}
 
-  if (window.__jump_done__) return;
-  window.__jump_done__ = true;
 
-  location.replace(TARGET + '?' + encodeURIComponent(ref));
-})();
+html,
+body {
+  background-color: var(--brand-bg) !important;
+  background-image: url("https://ai.aipages.dev/404.svg") !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: min(60vw, 520px) auto !important;
+  background-attachment: fixed !important;
+}
